@@ -61,13 +61,25 @@ export const submitApplication = async (
     if (error) throw error;
 
     // 🔔 EMAIL (Netlify Function)
-    fetch('/.netlify/functions/sendApplicationEmail', {
+   fetch('/.netlify/functions/sendApplicationEmail', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    trackingNumber,
+    name: `${data.first_name} ${data.last_name}`,
+    studentEmail: data.email,
+    program: data.coc_program || data.program_type
+  })
+}).catch(() => {});
+
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         trackingNumber,
         name: `${data.first_name} ${data.last_name}`,
-        email: data.email
+        studentEmail: data.email
+program: data.coc_program || data.program_type
+
       })
     });
 
