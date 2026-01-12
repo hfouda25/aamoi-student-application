@@ -75,7 +75,7 @@ export const ApplicationForm: React.FC<Props> = ({ onSuccess }) => {
       // Fixed: Using explicit boolean check to ensure proper TypeScript narrowing of the union type response.
       if (response.success === true) {
         toast.success("Application submitted successfully!");
-        onSuccess(response.trackingNumber);
+        onSuccess(trackingNumber, formData);
       } else {
         // Fixed: Explicitly handle the failure case using property check to access 'error' field.
         const errorMsg = 'error' in response ? response.error : "Submission failed.";
