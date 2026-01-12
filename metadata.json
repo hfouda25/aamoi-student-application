@@ -1,0 +1,7 @@
+{
+  "name": "AAMOI Student Application System",
+  "description": "A production-ready student application portal for AA Maritime & Offshore Institute with document uploads, automated tracking, and dual email notifications.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
