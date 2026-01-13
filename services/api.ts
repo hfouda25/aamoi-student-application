@@ -9,22 +9,16 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export const submitApplication = async (
   data: ApplicationFormData
 ): Promise<{ success: true; trackingNumber: string } | { success: false; error: string }> => {
-
   const trackingNumber =
-    `AAMOI-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000 + Math.random()*9000)}`;
+    `AAMOI-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
 
   try {
     const uploadFile = async (file: File, folder: string) => {
       const filePath = `${trackingNumber}/${folder}/${Date.now()}_${file.name}`;
-      const { error } = await supabase.storage
-        .from('applications')
-        .upload(filePath, file);
-
+      const { error } = await supabase.storage.from('applications').upload(filePath, file);
       if (error) throw error;
 
-      return supabase.storage
-        .from('applications')
-        .getPublicUrl(filePath).data.publicUrl;
+      return supabase.storage.from('applications').getPublicUrl(filePath).data.publicUrl;
     };
 
     const passportUrl = data.files.passport
@@ -60,31 +54,21 @@ export const submitApplication = async (
 
     if (error) throw error;
 
-    // 🔔 EMAIL (Netlify Function)
-   fetch('/.netlify/functions/sendApplicationEmail', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    trackingNumber,
-    name: `${data.first_name} ${data.last_name}`,
-    studentEmail: data.email,
-    program: data.coc_program || data.program_type
-  })
-}).catch(() => {});
-
+    // 🔔 EMAIL (Netlify Function) - send links (admin can download)
+    fetch('/.netlify/functions/sendApplicationEmail', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         trackingNumber,
         name: `${data.first_name} ${data.last_name}`,
-        studentEmail: data.email
-program: data.coc_program || data.program_type
-
+        studentEmail: data.email,
+        program: data.coc_program || data.program_type,
+        passportUrl,
+        pictureUrl
       })
-    });
+    }).catch(() => {});
 
     return { success: true, trackingNumber };
-
   } catch (err: any) {
     return { success: false, error: err.message };
   }
